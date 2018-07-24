@@ -127,13 +127,15 @@ def Execute(data):
         wr(data)
     elif m == "!pb":
         pb(data)
+	elif m == "!bingorow" or m == "!row":
+		random_row()
     elif m == "!userpb" or m == "!bingopb":
         userpb(data)
     elif m == "!average" or m == "!median" or m == "!results":
         bingoStats(data)
     elif mess == "!command" or m == "!commands" or m == "!comands" or m == "!comand":
         command(data)
-    elif "zora tunic" in mess or "blue tunic" in mess or "blauwe tuniek" in mess or "zora tuniek" in mess:
+    elif "zora tunic" in mess or "blue tunic" in mess or "blauwe tuniek" in mess or "zora tuniek" in mess or "tunique blue" in mess:
         tunic(data)
     elif m == "!monkas" or m == "!monka":
         monka(data)
@@ -503,6 +505,11 @@ def tunic(data):
     int = Parent.GetRandom(0, 100)
     if int < 101:
         Parent.SendTwitchMessage("BadTunic")
+		
+def randomRow():
+	rows = [name + str(i) for i in range(1,6) for name in ["row ", "col "]] + ["bl-tr", "tl-br"]
+	int = Parent.GetRandom(0, len(rows))
+	Parent.SendTwitchMessage(row[int])
 
 def command(data):
     if not Parent.IsOnCooldown(ScriptName, "!commands"):
