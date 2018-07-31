@@ -96,10 +96,10 @@ def Init():
     blacklist_dict = {"scaramanga" : ["1:00:37"]}
 
     global bingoPlayer
-    #bingoPlayer = Player("xwillmarktheplace")
+    bingoPlayer = Player("xwillmarktheplace")
 
     global bingoPlayers
-    #bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
+    bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
 
 
 
@@ -117,7 +117,7 @@ def Execute(data):
         card()
     elif m.startswith(raceURL):
         setRace(data)
-    elif m == "!race" | m == "!entrants":
+    elif m == "!race" or m == "!entrants":
         race()
     elif m == "!skulls":
         hundoSkulls(data)
@@ -127,8 +127,8 @@ def Execute(data):
         wr(data)
     elif m == "!pb":
         pb(data)
-	elif m == "!bingorow" or m == "!row":
-		random_row()
+    elif m == "!bingorow" or m == "!row":
+        random_row()
     elif m == "!userpb" or m == "!bingopb":
         userpb(data)
     elif m == "!average" or m == "!median" or m == "!results":
@@ -505,11 +505,11 @@ def tunic(data):
     int = Parent.GetRandom(0, 100)
     if int < 101:
         Parent.SendTwitchMessage("BadTunic")
-		
+
 def randomRow():
-	rows = [name + str(i) for i in range(1,6) for name in ["row ", "col "]] + ["bl-tr", "tl-br"]
-	int = Parent.GetRandom(0, len(rows))
-	Parent.SendTwitchMessage(row[int])
+    rows = [name + str(i) for i in range(1,6) for name in ["row ", "col "]] + ["bl-tr", "tl-br"]
+    int = Parent.GetRandom(0, len(rows))
+    Parent.SendTwitchMessage(row[int])
 
 def command(data):
     if not Parent.IsOnCooldown(ScriptName, "!commands"):
@@ -789,10 +789,10 @@ def extract_row(comment):
 
 def extract_type(url, date):
     if url.startswith('http://www.speedrunslive.com/tools/oot-bingo?mode=normal'):
-		if date > "01-06-2018":
-			return "v93"
-		else:
-			return "v92"
+        if date > "01-06-2018":
+            return "v93"
+        else:
+            return "v92"
     elif url.startswith('http://www.buzzplugg.com/bryan/v9.2NoSaria/'):
         return "NoSaria"
     elif "blackout" in url:
@@ -910,10 +910,10 @@ class Player:
             races = self.bingos
         elif type == "v92":
             races = [race for race in self.races if race.type == "v92"]
-		elif type == "v93":
+        elif type == "v93":
             races = [race for race in self.races if race.type == "v93"]
-		elif type == "v92+":
-			races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
+        elif type == "v92+":
+            races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
         else:
             races = self.races
 
