@@ -371,7 +371,6 @@ def userpb(data):
 
     if data.GetParam(0).lower() == "!bingopb":
         cat = "bingo"
-        cat = "bingo"
     elif data.GetParam(1) == "":
         Parent.SendTwitchMessage("Provide a username please!")
         return
@@ -414,7 +413,7 @@ def userpb(data):
             break
     cat = cat.replace("_", " ")
     if cat == "bingo":
-        userTime = str(bingoPB(username))
+        usertime = str(bingoPB(username, "v92")) + " (v9.2), " + str(bingoPB(username, "v93")) + " v(9.2)"
     if userTime == None:
         return
     else:
@@ -789,7 +788,7 @@ def extract_row(comment):
 
 def extract_type(url, date):
     if url.startswith('http://www.speedrunslive.com/tools/oot-bingo?mode=normal'):
-        if date > "01-06-2018":
+        if date > 1527811201: # date is in seconds!
             return "v93"
         else:
             return "v92"
@@ -901,7 +900,11 @@ class Player:
         return datetime.timedelta(seconds=res)#.replace(microseconds = 0)
 
     def get_pb(self, type = "v92"):
-        race = self.select_races(type)[0]
+        try:
+            race = self.select_races(type)[0]
+        except:
+            Parent.SendTwitchMessage("PB for version " + type + " not found.")
+
         return race.time
 
 
