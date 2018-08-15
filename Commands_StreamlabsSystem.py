@@ -96,10 +96,10 @@ def Init():
     blacklist_dict = {"scaramanga" : ["1:00:37"]}
 
     global bingoPlayer
-    #bingoPlayer = Player("xwillmarktheplace")
+    bingoPlayer = Player("xwillmarktheplace")
 
     global bingoPlayers
-    #bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
+    bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
 
 
 
@@ -111,13 +111,14 @@ def Init():
 def Execute(data):
     m = data.GetParam(0).lower()
     mess = data.Message.lower()
-    if mess.startswith(bingoURL) | mess.startswith(noSariaURL):
+
+    if mess.startswith(bingoURL) or mess.startswith(noSariaURL):
         setBingo(data)
-    elif m == "!card" or m == "!seed" or m == "!board":
+    if m == "!card" or m == "!seed" or m == "!board":
         card()
-    elif m.startswith(raceURL):
+    if m.startswith(raceURL):
         setRace(data)
-    elif m == "!race" | m == "!entrants":
+    elif m == "!race" or m == "!entrants":
         race()
     elif m == "!skulls":
         hundoSkulls(data)
@@ -133,7 +134,7 @@ def Execute(data):
         bingoStats(data)
     elif mess == "!command" or m == "!commands" or m == "!comands" or m == "!comand":
         command(data)
-    elif "zora tunic" in mess or "blue tunic" in mess or "blauwe tuniek" in mess or "zora tuniek" in mess:
+    elif "zora tunic" in mess or "blue tunic" in mess or "blauwe tuniek" in mess or "zora tuniek" in mess or "tunique bleu" in mess or "tunique bleu" in mess:
         tunic(data)
     elif m == "!monkas" or m == "!monka":
         monka(data)
@@ -202,7 +203,7 @@ def get_entrants_string(id):
 
     #entrant_info = {"entrants " : entrants}
     #entrant_info
-    
+
     return entrants
 
 
@@ -368,7 +369,6 @@ def userpb(data):
     title = readjson("https://decapi.me/twitch/title/" + Parent.GetChannelName(), jsonConv=False)
 
     if data.GetParam(0).lower() == "!bingopb":
-        cat = "bingo"
         cat = "bingo"
     elif data.GetParam(1) == "":
         Parent.SendTwitchMessage("Provide a username please!")
@@ -691,7 +691,7 @@ def bingoStats(data):
 
         avg = player.get_average(n = n, avg=command[1:])
         value = str(avg)
-        
+
     if command == "!results":
         races = bingoPlayer.get_races(n=n, type="v92", sort = "latest")
         times = [str(race.time) for race in races]
