@@ -1,10 +1,19 @@
 #---------------------------------------
 # Import Libraries
 #---------------------------------------
+OFFLINE = True
+
 import sys
-import clr
-clr.AddReference("IronPython.SQLite.dll")
-clr.AddReference("IronPython.Modules.dll")
+if not OFFLINE:
+    import clr
+    clr.AddReference("IronPython.SQLite.dll")
+    clr.AddReference("IronPython.Modules.dll")
+else:
+    global bingoPlayers
+    bingoPlayers = {}
+    global blacklist_dict
+    blacklist_dict = {"scaramanga" : ["1:00:37"]}
+
 import datetime
 import time
 import re
@@ -26,6 +35,8 @@ Version = "1.0.0.0"
 #---------------------------------------
 # Set Variables
 #---------------------------------------
+
+
 #bingoPB = "01:21:33"
 blackoutPB = "4:21:32"
 
@@ -159,19 +170,19 @@ def Tick():
 
 #Bingo
 def setBingo(data):
-    if Parent.HasPermission(data.User, "Caster", ""):
+    if Parent.HasPermission(data.User, "Moderator", ""):
         global bingoCard
         bingoCard = data.Message
         seed = re.search(r'seed=\d+', data.Message).group(0)
         seed = str.replace(seed, "seed=", "")
-        Parent.SendTwitchMessage("The !card command has been updated (seed " + seed +").")
+        message("The !card command has been updated (seed " + seed +").")
 
 def card():
-    Parent.SendTwitchMessage(bingoCard)
+    message(bingoCard)
 
 
 def setRace(data):
-    if Parent.HasPermission(data.User, "Caster", ""):
+    if Parent.HasPermission(data.User, "Moderator", ""):
         global raceID
         id = data.Message.replace("#srl-", "")
         raceID = id
@@ -179,14 +190,14 @@ def setRace(data):
         entrants = get_entrants_string(id)
 
         message = "The !race command has been updated (#srl-" + id + ")." + entrants
-        Parent.SendTwitchMessage(message)
+        message(message)
 def race():
     if raceID == "":
-        Parent.SendTwitchMessage("No race has been set yet.")
+        message("No race has been set yet.")
         return
     entrants = get_entrants_string(raceID)
     message = "http://www.speedrunslive.com/race/?id="+raceID+entrants
-    Parent.SendTwitchMessage(message)
+    message(message)
 
 def get_entrants_string(id):
 
@@ -211,7 +222,8 @@ def get_entrants_string(id):
 #def get_entrants(   qa)
 
 def hundoSkulls(data):
-    if Parent.HasPermission(data.User, "Caster", ""):
+    global skullCounter
+    if Parent.HasPermission(data.User, "Moderator", ""):
         try:
             if data.GetParam(1) != "":
                 n = int(str.replace(data.Message, "!skulls ", ""))
@@ -222,14 +234,15 @@ def hundoSkulls(data):
             else:
                 n = skullCounter
         except ValueError:
-            Parent.SendTwitchMessage("Please use an integer as argument for !skulls.")
+            message("Please use an integer as argument for !skulls.")
             return
         n = printLines("HundoSkulls.txt", n, 100, 5)
-        global skullCounter
+        #global skullCounter
         skullCounter = n
 
 def hundoHearts(data):
-    if Parent.HasPermission(data.User, "Caster", ""):
+    global heartsCounter
+    if Parent.HasPermission(data.User, "Moderator", ""):
         try:
             if data.GetParam(1) != "":
                 n = int(str.replace(data.Message, "!hearts ", ""))
@@ -240,10 +253,10 @@ def hundoHearts(data):
             else:
                 n = heartsCounter
         except ValueError:
-            Parent.SendTwitchMessage("Please use an integer as argument for !hearts.")
+            message("Please use an integer as argument for !hearts.")
             return
         n = printLines("HundoHearts.txt", n, 36, 5)
-        global heartsCounter
+        #global heartsCounter
         heartsCounter = n
 
 def printLines(file, start, max, incr):
@@ -254,7 +267,7 @@ def printLines(file, start, max, incr):
         text = open(".\Services\Scripts\CommandScript\\" + file, "r")
     except IOError:
 
-        Parent.SendTwitchMessage("Document could not be opened.")
+        message("Document could not be opened.")
         return
     lines = text.read().split('\n')
 
@@ -262,7 +275,7 @@ def printLines(file, start, max, incr):
     for i in range(0, incr):
         if n > max:
             break
-        Parent.SendTwitchMessage(lines[n - 1])
+        message(lines[n - 1])
         n += 1
     if n > max:
         n = 1
@@ -282,25 +295,25 @@ def wr(data):
 
     if cat == "error":
         if data.GetParam(1) == "":
-            Parent.SendTwitchMessage("No WR found for current stream.")
+            message("No WR found for current stream.")
         else:
-            Parent.SendTwitchMessage("No WR found for given category.")
+            message("No WR found for given category.")
         return
 
-    #Parent.SendTwitchMessage(cat)
+    #message(cat)
 
     game = "j1l9qz1g"  # oot
     for extCat in extCategories:
         if extCat in cat:
             game = "76rkv4d8" #extensions
             break
-    #Parent.SendTwitchMessage(game)
+    #message(game)
 
 
     url = "https://www.speedrun.com/api/v1/games/" + game + "/categories"
     wrData = readjson(url)['data']
-    #Parent.SendTwitchMessage(url)
-    #Parent.SendTwitchMessage(categories[cat])
+    #message(url)
+    #message(categories[cat])
     wrTime = None
     for i in range(len(wrData)):
         catData = wrData[i]
@@ -309,17 +322,17 @@ def wr(data):
                 wrTime, name = getWrInfo(categories[varCat + " tab"], game, categories[varCat + " variables"], categories[cat])
                 break
         if catData['id'] == categories[cat]:
-            #Parent.SendTwitchMessage(catData['id'])
+            #message(catData['id'])
             wrTime, name = getWrInfo(categories[cat], game)
             break
 
     cat = cat.replace("_", " ")
     if cat == "bingo":
-        Parent.SendTwitchMessage("There's no such thing as a bingo WR Kappa")
+        message("There's no such thing as a bingo WR Kappa")
     elif wrTime == None:
-        Parent.SendTwitchMessage("No WR found for OoT " + cat + ".")
+        message("No WR found for OoT " + cat + ".")
     else:
-        Parent.SendTwitchMessage("The current world record for OoT " + cat + " is " + wrTime + " by " + name + ".")
+        message("The current world record for OoT " + cat + " is " + wrTime + " by " + name + ".")
 
 
 
@@ -333,9 +346,9 @@ def pb(data):
 
     if cat == "error":
         if data.GetParam(1) == "":
-            Parent.SendTwitchMessage("No PB found for current stream.")
+            message("No PB found for current stream.")
         else:
-            Parent.SendTwitchMessage("No PB found for given category.")
+            message("No PB found for given category.")
         return
 
     url = "https://www.speedrun.com/api/v1/users/kjppz52j/personal-bests"
@@ -357,9 +370,9 @@ def pb(data):
 
     cat = cat.replace("_", " ")
     if pbTime == None:
-        Parent.SendTwitchMessage("No PB found yet for OoT " + cat + ".")
+        message("No PB found yet for OoT " + cat + ".")
     else:
-        Parent.SendTwitchMessage("My current PB for OoT " + cat + " is " + pbTime + ".")
+        message("My current PB for OoT " + cat + " is " + pbTime + ".")
 
 
 
@@ -371,7 +384,7 @@ def userpb(data):
     if data.GetParam(0).lower() == "!bingopb":
         cat = "bingo"
     elif data.GetParam(1) == "":
-        Parent.SendTwitchMessage("Provide a username please!")
+        message("Provide a username please!")
         return
     elif data.GetParam(2) == "":
         cat = checkCat(title.lower())
@@ -383,9 +396,9 @@ def userpb(data):
 
     if cat == "error":
         if data.GetParam(2) == "":
-            Parent.SendTwitchMessage("No PB found for current stream.")
+            message("No PB found for current stream.")
         else:
-            Parent.SendTwitchMessage("No PB found for given category.")
+            message("No PB found for given category.")
         return
 
     game = "j1l9qz1g"  # oot
@@ -396,8 +409,8 @@ def userpb(data):
 
     url = "https://www.speedrun.com/api/v1/games/" + game + "/categories"
     userData = readjson(url)['data']
-    # Parent.SendTwitchMessage(url)
-    # Parent.SendTwitchMessage(categories[cat])
+    # message(url)
+    # message(categories[cat])
     userTime = None
     for i in range(len(userData)):
         catData = userData[i]
@@ -407,7 +420,7 @@ def userpb(data):
                                          categories[cat])
                 break
         if catData['id'] == categories[cat]:
-            # Parent.SendTwitchMessage(catData['id'])
+            # message(catData['id'])
             userTime = getUserTime(username, categories[cat], game)
             break
     cat = cat.replace("_", " ")
@@ -416,7 +429,7 @@ def userpb(data):
     if userTime == None:
         return
     else:
-        Parent.SendTwitchMessage(username + "'s PB for OoT " + cat + " is " + userTime + ".")
+        message(username + "'s PB for OoT " + cat + " is " + userTime + ".")
 
 
 
@@ -431,7 +444,7 @@ def getWrInfo(catID, game = "j1l9qz1g", var = None, varID = None):
     baseURL ="https://www.speedrun.com/api/v1/leaderboards/" + game + "/category/" + catID + "?top=1"
     if var != None:
         baseURL += "&var-" + var + "=" + varID
-    #Parent.SendTwitchMessage(baseURL)
+    #message(baseURL)
     category = readjson(baseURL)
 
     run = category['data']['runs'][0]['run']
@@ -456,7 +469,7 @@ def getUserTime(username, catID, game = "j1l9qz1g", var = None, varID = None):
     userData = readjson(userURL)
 
     if userData['data'] == []:
-        Parent.SendTwitchMessage("Username cannot be found.")
+        message("Username cannot be found.")
         return None
     else:
         userID = userData['data'][0]['id']
@@ -464,7 +477,7 @@ def getUserTime(username, catID, game = "j1l9qz1g", var = None, varID = None):
 
     runs = category['data']['runs']
 
-    #Parent.SendTwitchMessage(str(len(runs))) get amount of runs!
+    #message(str(len(runs))) get amount of runs!
     for i in range(len(runs)):
         run = runs[i]['run']
         if 'id' in run['players'][0] and run['players'][0]['id'] == userID:
@@ -472,7 +485,7 @@ def getUserTime(username, catID, game = "j1l9qz1g", var = None, varID = None):
 
             return runTime
 
-    Parent.SendTwitchMessage("No record found for " + username + ".")
+    message("No record found for " + username + ".")
     return None
 
 
@@ -490,24 +503,24 @@ def monka(data):
         if "monka" in name:
             monka.append(name)
     int = Parent.GetRandom(0, len(monka)-1)
-    Parent.SendTwitchMessage(monka[int])
+    message(monka[int])
 
 # Post monkaStare with chance
 def monkaStare(data):
     int = Parent.GetRandom(0, 100)
     if int < 40:
-        Parent.SendTwitchMessage("monkaStare")
+        message("monkaStare")
 
 # Post badTunic
 def tunic(data):
     int = Parent.GetRandom(0, 100)
     if int < 101:
-        Parent.SendTwitchMessage("BadTunic")
+        message("BadTunic")
 
 def command(data):
     if not Parent.IsOnCooldown(ScriptName, "!commands"):
         Parent.AddCooldown(ScriptName, "!commands", 20)
-        Parent.SendTwitchMessage("List of commands: https://pastebin.com/aQEG2T5D")
+        message("List of commands: https://pastebin.com/aQEG2T5D")
 
 def smiley(data):
     if not Parent.IsOnCooldown(ScriptName, "!smiley"):
@@ -515,7 +528,7 @@ def smiley(data):
         if twoSmileys:
             int = Parent.GetRandom(0, 100)
             if int < 45:
-                Parent.SendTwitchMessage(":)")
+                message(":)")
             twoSmileys = False
             Parent.AddCooldown(ScriptName, "!smiley", 360)
         else:
@@ -523,12 +536,12 @@ def smiley(data):
 
 def owl(data):
     if "parrot" in data.Message:
-        Parent.SendTwitchMessage("DontYouNotWishForMeToNotRepeat")
+        message("DontYouNotWishForMeToNotRepeat")
         Parent.AddCooldown(ScriptName, "!owl", 120)
     else:
          int = Parent.GetRandom(0, 100)
          if not Parent.IsOnCooldown(ScriptName, "!owl") and int < 35 :
-             Parent.SendTwitchMessage("DontYouNotWishForMeToNotRepeat")
+             message("DontYouNotWishForMeToNotRepeat")
              Parent.AddCooldown(ScriptName, "!owl", 360)
 
 
@@ -593,7 +606,7 @@ def checkCat(title):
 
 def printList(list):
     for i in range(len(list)):
-        Parent.SendTwitchMessage(list[i])
+        message(list[i])
 
 def readjson(url, jsonConv = True, printMessage = True, delete_function = False):
     response = Parent.GetRequest(url, {})
@@ -602,7 +615,7 @@ def readjson(url, jsonConv = True, printMessage = True, delete_function = False)
 
         #match = re.search(r"[^\(]+\(", response, re.IGNORECASE)
         #if match:
-            #Parent.SendTwitchMessage(match.group())
+            #message(match.group())
         response = response.replace(r"\"\nrenderEntrants(", "") # replace first function (renderEntrants)
         response = response [:-4] # delete last )
 
@@ -614,22 +627,24 @@ def readjson(url, jsonConv = True, printMessage = True, delete_function = False)
             result = json.loads(result)
     else:
         if printMessage:
-            Parent.SendTwitchMessage("Error in accessing api.")
+            message("Error in accessing api.")
         return None
     return result
 
+def read_json_file(file):
+    return json.load(open(file))
 
 def readjson_funct(url, jsonConv = True, printMessage = True):
-    #Parent.SendTwitchMessage(url)
+    #message(url)
     response = Parent.GetRequest(url, {})
 
-            #Parent.SendTwitchMessage(match.group())
+            #message(match.group())
     response = response[53:]
     response = response [:-5] # delete last )
     response = response.replace("\\\"", "\"")
     response = response.replace(r"\n", "")
 
-    #Parent.SendTwitchMessage(response)
+    #message(response)
     responseObj = json.loads(response)
     return responseObj
 
@@ -638,9 +653,9 @@ def readjson_funct(url, jsonConv = True, printMessage = True):
         if jsonConv:
             result = json.loads(result)
     else:
-        #Parent.SendTwitchMessage(url)
+        #message(url)
         if printMessage:
-            Parent.SendTwitchMessage("Error in accessing api.")
+            message("Error in accessing api.")
         return None
     return result
 
@@ -665,7 +680,7 @@ def readjson_funct(url, jsonConv = True, printMessage = True):
 ############ READ BINGOS ===================
 
 
-def bingoStats(data):
+def bingoStats(data, from_file=False):
     command = data.GetParam(0).lower()
     player = bingoPlayer
     orig = bingoPlayer.name
@@ -683,11 +698,11 @@ def bingoStats(data):
         else:
             orig = param
             name = param.lower()
-            player = getPlayer(name)
+            player = getPlayer(name, from_file)
         i = i + 1
 
     if command == "!average" or command == "!median":
-        #Parent.SendTwitchMessage(player.name)
+        #message(player.name)
 
         avg = player.get_average(n = n, avg=command[1:])
         value = str(avg)
@@ -698,19 +713,19 @@ def bingoStats(data):
         value = ", ".join(times)
 
 
-    Parent.SendTwitchMessage(orig + "'s " + command[1:] + " for the last " + str(n) + " bingos: " + value)
+    message(orig + "'s " + command[1:] + " for the last " + str(n) + " bingos: " + value)
 
 def bingoPB(user, type):
     player = getPlayer(user)
     return player.get_pb(type = type)
 
 
-def getPlayer(user):
+def getPlayer(user, from_file=False):
     global bingoPlayers
     if user in bingoPlayers.keys():
         player = bingoPlayers[user]
     else:
-        player = Player(user)
+        player = Player(user, from_file)
         if not hasattr(player, 'races'):  # user doesn't exist
             return
         else:
@@ -782,10 +797,10 @@ def extract_row(comment):
 
 def extract_type(url, date):
     if url.startswith('http://www.speedrunslive.com/tools/oot-bingo?mode=normal'):
-		if date > "01-06-2018":
-			return "v93"
-		else:
-			return "v92"
+        if date > "01-06-2018":
+            return "v93"
+        else:
+            return "v92"
     elif url.startswith('http://www.buzzplugg.com/bryan/v9.2NoSaria/'):
         return "NoSaria"
     elif "blackout" in url:
@@ -845,12 +860,15 @@ class Player:
         self.name = name
 
         #try:
-        self.json = readjson("http://api.speedrunslive.com/pastraces?player=" + name + "&pageSize=1000", jsonConv=True, printMessage=False)
+        if from_file:
+            self.json = read_json_file("./data/races_" + name + ".txt")
+        else:
+            self.json = readjson("http://api.speedrunslive.com/pastraces?player=" + name + "&pageSize=1000", jsonConv=True, printMessage=False)
         if not self.json:
             userURL = "https://www.speedrun.com/api/v1/users?lookup=" + name
             userData = readjson(userURL)
             if userData["data"] == []:
-                Parent.SendTwitchMessage("User not found.")
+                message("User not found.")
             else:
                 name = userData['data'][0]['names']['international']
                 self.__init__(name, from_file)
@@ -903,10 +921,10 @@ class Player:
             races = self.bingos
         elif type == "v92":
             races = [race for race in self.races if race.type == "v92"]
-		elif type == "v93":
+        elif type == "v93":
             races = [race for race in self.races if race.type == "v93"]
-		elif type == "v92+":
-			races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
+        elif type == "v92+":
+            races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
         else:
             races = self.races
 
@@ -945,6 +963,13 @@ def median(times):
         median = times[mid]
 
     return median
+
+
+def message(str):
+    if OFFLINE:
+        print(str)
+    else:
+        message(str)
 
 
 
