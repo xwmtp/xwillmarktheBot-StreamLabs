@@ -101,7 +101,8 @@ def Init():
     global bingoPlayers
     bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
 
-
+    global alias_dict
+    alias_dict = {"phoenixfeather1" : "phoenixfeather"}
 
     return
 
@@ -683,6 +684,8 @@ def bingoStats(data):
         else:
             orig = param
             name = param.lower()
+            if name in alias_dict.keys():
+                name = alias_dict[name]
             player = getPlayer(name)
         i = i + 1
 
@@ -860,6 +863,9 @@ class Player:
                 results.append(Race(date, time, goal, comment, name))
         self.races = results
         self.bingos = [race for race in self.races if race.isBingo()]
+        if (self.bingos == []) or (self.bingos is None):
+            Parent.SendTwitchMessage("No recorded bingo races found for user {}.".format(self.name))
+        #Parent.SendTwitchMessage(str(len(self.bingos)))
 
         if self.name.lower() in blacklist_dict.keys():
             self.blacklist = blacklist_dict[self.name]
@@ -925,7 +931,8 @@ def extract_times(races, seconds = True):
 
 def mean(times):
     times = sorted(times)
-    return sum(times)/len(times)
+    return sum(times)/\
+           len(times)
 
 def median(times):
     times = sorted(times)
