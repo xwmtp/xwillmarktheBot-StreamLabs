@@ -101,7 +101,8 @@ def Init():
     global bingoPlayers
     bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
 
-
+    global alias_dict
+    alias_dict = {"phoenixfeather1" : "phoenixfeather"}
 
     return
 
@@ -683,6 +684,8 @@ def bingoStats(data):
         else:
             orig = param
             name = param.lower()
+            if name in alias_dict.keys():
+                name = alias_dict[name]
             player = getPlayer(name)
         i = i + 1
 
@@ -760,11 +763,12 @@ def retrieve_race_info(race, player, v92 = True, noSaria=True, rest = False):
             date = int(race["date"])
             comment = ""
 
-            if time == -1 or ((not v92) and goal.startswith(V92)) or ((not noSaria) and goal.startswith(NoSaria)):
+            if time == -1 or "bingo" not in goal: # ((not v92) and goal.startswith(V92)) or ((not noSaria) and goal.startswith(NoSaria)):
                 continue
             elif not rest:
                 continue
-
+            if player.lower() != "xwillmarktheplace":
+                Parent.SendTwitchMessage(goal)
             time = datetime.timedelta(seconds=time)
 
             comment = entrant["message"]
@@ -780,12 +784,9 @@ def extract_row(comment):
     else:
         return "BLANK"
 
-def extract_type(url, date):
-    if url.startswith('http://www.speedrunslive.com/tools/oot-bingo?mode=normal'):
-		if date > "01-06-2018":
-			return "v93"
-		else:
-			return "v92"
+def extract_type(url):
+    if 'http://www.speedrunslive.com/tools/oot-bingo?mode=normal' in url:
+        return "v92"
     elif url.startswith('http://www.buzzplugg.com/bryan/v9.2NoSaria/'):
         return "NoSaria"
     elif "blackout" in url:
@@ -862,7 +863,10 @@ class Player:
                 (date, time, goal, comment) = tuple
                 results.append(Race(date, time, goal, comment, name))
         self.races = results
-        self.bingos = [race for race in self.races if race.isBingo()]
+        self.bingos = [race for race in self.races if race.type == "v92"]
+        if (self.bingos == []) or (self.bingos is None):
+            Parent.SendTwitchMessage("No recorded bingo races found for user {}.".format(self.name))
+        #Parent.SendTwitchMessage(str(len(self.bingos)))
 
         if self.name.lower() in blacklist_dict.keys():
             self.blacklist = blacklist_dict[self.name]
@@ -886,6 +890,8 @@ class Player:
         races = self.select_races(type, sort="latest")[:n]
 
         times = extract_times(races, seconds=True)
+        if times == []:
+            return
 
         if avg == "average" or avg == "mean":
             res = int(mean(times))
