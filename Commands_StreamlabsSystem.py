@@ -851,7 +851,10 @@ class Player:
             userURL = "https://www.speedrun.com/api/v1/users?lookup=" + name
             userData = readjson(userURL)
             if userData["data"] == []:
-                Parent.SendTwitchMessage("User not found.")
+
+                match = find_match(name)
+                if match is None:
+                    Parent.SendTwitchMessage("User not found.")
             else:
                 name = userData['data'][0]['names']['international']
                 self.__init__(name, from_file)
@@ -948,6 +951,9 @@ def median(times):
 
     return median
 
+
+
+def find_match:
 
 
 
