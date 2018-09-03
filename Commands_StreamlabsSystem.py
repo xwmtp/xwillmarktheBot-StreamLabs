@@ -352,7 +352,7 @@ def pb(data):
         elif run['category'] == categories[cat]:
             pbTime = getTime(run)
     if cat == "bingo":
-        pbTime = str(bingoPB("xwillmarktheplace"))
+        pbTime = str(bingoPB("xwillmarktheplace", "v92")) + " (v9.2), " + str(bingoPB("xwillmarktheplace", "v93")) + " v(9.2)" 
     elif cat == "blackout":
         pbTime = blackoutPB
 
@@ -703,9 +703,9 @@ def bingoStats(data):
 
     Parent.SendTwitchMessage(orig + "'s " + command[1:] + " for the last " + str(n) + " bingos: " + value)
 
-def bingoPB(user):
+def bingoPB(user, type):
     player = getPlayer(user)
-    return player.get_pb(type = "v92")
+    return player.get_pb(type = type)
 
 
 def getPlayer(user):
@@ -735,7 +735,7 @@ class Race:
         self.time = time
         self.url = url
         self.seed = extract_seed(url)
-        self.type = extract_type(url)
+        self.type = extract_type(url, date)
         self.player = player
         self.comment = comment
         self.row = regex_to_row(extract_row(comment))
@@ -912,6 +912,10 @@ class Player:
             races = self.bingos
         elif type == "v92":
             races = [race for race in self.races if race.type == "v92"]
+		elif type == "v93":
+            races = [race for race in self.races if race.type == "v93"]
+		elif type == "v92+":
+			races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
         else:
             races = self.races
 
