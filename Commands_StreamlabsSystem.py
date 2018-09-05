@@ -9,6 +9,7 @@ import datetime
 import time
 import re
 import json
+from Levenshtein import distance
 
 
 
@@ -855,10 +856,13 @@ class Player:
                 match = find_match(name)
                 if match is None:
                     Parent.SendTwitchMessage("User not found.")
-            else:
-                name = userData['data'][0]['names']['international']
-                self.__init__(name, from_file)
-                return
+                    return
+                else:
+                    name = match
+
+            name = userData['data'][0]['names']['international']
+            self.__init__(name, from_file)
+            return
         results = []
         for race in self.json["pastraces"]:
             tuple = retrieve_race_info(race, name, rest=True)
@@ -957,7 +961,26 @@ def median(times):
 
 
 
-def find_match:
+def find_match(name, min_match = 3):
+    with open('Leaderboard.txt') as f:
+        leaderboard = f.readlines()
+
+    if len(name) <= 5:
+        min_match = 1
+
+    min = 9000
+    best_lead = None
+    for lead in leaderboard:
+        edit_dist = distance(name.lower(), lead.lower())
+        if edit_dist < min:
+            min = edit_dist
+            best_lead = lead
+
+    if min <= min_match:
+        return best_lead
+    else:
+        return None
+
 
 
 
