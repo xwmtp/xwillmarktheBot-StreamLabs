@@ -912,10 +912,10 @@ class Player:
             races = self.bingos
         elif type == "v92":
             races = [race for race in self.races if race.type == "v92"]
-		elif type == "v93":
+        elif type == "v93":
             races = [race for race in self.races if race.type == "v93"]
-		elif type == "v92+":
-			races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
+        elif type == "v92+":
+            races = [race for race in self.races if ((race.type == "v92") | (race.type == "v93"))]
         else:
             races = self.races
 
