@@ -784,7 +784,7 @@ def extract_row(comment):
     else:
         return "BLANK"
 
-def extract_type(url):
+def extract_type(url, date):
     if 'http://www.speedrunslive.com/tools/oot-bingo?mode=normal' in url:
         return "v92"
     elif url.startswith('http://www.buzzplugg.com/bryan/v9.2NoSaria/'):
