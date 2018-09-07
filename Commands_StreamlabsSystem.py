@@ -9,7 +9,7 @@ import datetime
 import time
 import re
 import json
-from Levenshtein import distance
+#from Levenshtein import distance
 
 
 
@@ -103,7 +103,8 @@ def Init():
     bingoPlayers = {"xwillmarktheplace" : bingoPlayer}
 
     global alias_dict
-    alias_dict = {"phoenixfeather1" : "phoenixfeather"}
+    alias_dict = {"phoenixfeather1" : "phoenixfeather",
+                  "dannyb" : "dannyb21892"}
 
     return
 
@@ -690,6 +691,10 @@ def bingoStats(data):
             player = getPlayer(name)
         i = i + 1
 
+    if player is None:
+        Parent.SendTwitchMessage("No bingo stats found for player {}.".format(name))
+        return
+
     if command == "!average" or command == "!median":
         #Parent.SendTwitchMessage(player.name)
 
@@ -702,7 +707,7 @@ def bingoStats(data):
         value = ", ".join(times)
 
 
-    Parent.SendTwitchMessage(orig + "'s " + command[1:] + " for the last " + str(n) + " bingos: " + value)
+    Parent.SendTwitchMessage(player.name + "'s " + command[1:] + " for the last " + str(n) + " bingos: " + value)
 
 def bingoPB(user, type):
     player = getPlayer(user)
@@ -715,10 +720,11 @@ def getPlayer(user):
         player = bingoPlayers[user]
     else:
         player = Player(user)
-        if not hasattr(player, 'races'):  # user doesn't exist
+        if not player.complete:  # user doesn't exist
             return
         else:
             bingoPlayers[user] = player
+
     return player
 
 
@@ -768,8 +774,6 @@ def retrieve_race_info(race, player, v92 = True, noSaria=True, rest = False):
                 continue
             elif not rest:
                 continue
-            if player.lower() != "xwillmarktheplace":
-                Parent.SendTwitchMessage(goal)
             time = datetime.timedelta(seconds=time)
 
             comment = entrant["message"]
@@ -785,7 +789,7 @@ def extract_row(comment):
     else:
         return "BLANK"
 
-def extract_type(url):
+def extract_type(url, date):
     if 'http://www.speedrunslive.com/tools/oot-bingo?mode=normal' in url:
         return "v92"
     elif url.startswith('http://www.buzzplugg.com/bryan/v9.2NoSaria/'):
@@ -845,6 +849,7 @@ class Player:
 
     def __init__(self, name, from_file=False):
         self.name = name
+        self.complete = False
 
         #try:
         self.json = readjson("http://api.speedrunslive.com/pastraces?player=" + name + "&pageSize=1000", jsonConv=True, printMessage=False)
@@ -859,8 +864,8 @@ class Player:
                     return
                 else:
                     name = match
-
-            name = userData['data'][0]['names']['international']
+            else:
+                name = userData['data'][0]['names']['international']
             self.__init__(name, from_file)
             return
         results = []
@@ -873,6 +878,8 @@ class Player:
         self.bingos = [race for race in self.races if race.type == "v92"]
         if (self.bingos == []) or (self.bingos is None):
             Parent.SendTwitchMessage("No recorded bingo races found for user {}.".format(self.name))
+        else:
+            self.complete = True
         #Parent.SendTwitchMessage(str(len(self.bingos)))
 
         if self.name.lower() in blacklist_dict.keys():
@@ -961,25 +968,49 @@ def median(times):
 
 
 
-def find_match(name, min_match = 3):
-    with open('Leaderboard.txt') as f:
+def find_match(name, min_match = 4):
+    import os
+    cwd = os.getcwd()
+
+    #Parent.SendTwitchMessage(cwd)
+    with open(r'.\Services\Scripts\CommandScript\Leaderboard.txt') as f:
         leaderboard = f.readlines()
 
     if len(name) <= 5:
-        min_match = 1
+        min_match = 2
 
     min = 9000
     best_lead = None
     for lead in leaderboard:
-        edit_dist = distance(name.lower(), lead.lower())
-        if edit_dist < min:
-            min = edit_dist
+        #min_match = 0.3 * len(lead)
+        edit_dist = levenshteinDistance(name.lower(), lead.lower())
+        edit_perc = edit_dist / float(len(lead))
+        if edit_perc < min:
+            min = edit_perc
             best_lead = lead
 
-    if min <= min_match:
+    if min <= 0.3:
+        #Parent.SendTwitchMessage(best_lead)
+        Parent.SendTwitchMessage(str(min))
         return best_lead
     else:
+        Parent.SendTwitchMessage("No edit_dis match found.")
         return None
+
+def levenshteinDistance(s1, s2):
+    if len(s1) > len(s2):
+        s1, s2 = s2, s1
+
+    distances = range(len(s1) + 1)
+    for i2, c2 in enumerate(s2):
+        distances_ = [i2+1]
+        for i1, c1 in enumerate(s1):
+            if c1 == c2:
+                distances_.append(distances[i1])
+            else:
+                distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
+        distances = distances_
+    return distances[-1]
 
 
 
