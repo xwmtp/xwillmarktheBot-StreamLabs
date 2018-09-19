@@ -1,7 +1,8 @@
 /BingoStats.py
 /Commands_Dev.py
 /Helpers.py
-
+__pycache__/
+data/
 /SRL HTML
 /lib
 /.idea

@@ -104,6 +104,24 @@ def Init():
     global alias_dict
     alias_dict = {"phoenixfeather1" : "phoenixfeather"}
 
+    global clip_list
+    clip_list = load_clips()
+
+    global stopwords
+    stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as",
+                 "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot",
+                 "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few",
+                 "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's",
+                 "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm",
+                 "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't",
+                 "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours",
+                 "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so",
+                 "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's",
+                 "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until",
+                 "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's",
+                 "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you",
+                 "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"]
+
     return
 
 #---------------------------------------
@@ -143,6 +161,8 @@ def Execute(data):
         monkaStare(data)
     elif " owl" in mess or "owl " in mess or "parrot" in mess:
         owl(data)
+    elif m == "!clip" or m == "!clips":
+        clip_check(data)
     elif mess == ":)":
         smiley(data)
     else:
@@ -531,6 +551,80 @@ def owl(data):
          if not Parent.IsOnCooldown(ScriptName, "!owl") and int < 35 :
              Parent.SendTwitchMessage("DontYouNotWishForMeToNotRepeat")
              Parent.AddCooldown(ScriptName, "!owl", 360)
+
+
+
+
+
+
+#### CLIPS
+
+
+class Clip:
+
+    def __init__(self, line):
+        parts = line.split(";")
+        self.name = parts[0]
+        self.link = parts[1]
+        try:
+            self.keywords = parts[2].split(',')
+        except:
+            self.keywords = []
+
+    def print_clip(self):
+        Parent.SendTwitchMessage(self.name + " " + self.link)
+
+
+def load_clips():
+    try:
+        text = open(".\Services\Scripts\CommandScript\clips.txt", "r")
+    except IOError:
+        Parent.SendTwitchMessage("CLips document could not be opened.")
+        return
+    lines = text.read().split('\n')
+
+    clip_list = []
+    for line in lines:
+        clip = Clip(line)
+        clip_list.append(clip)
+
+    return clip_list
+
+def clip_check(data):
+
+    global clip_dict
+
+
+    param = data.GetParam(1).lower()
+
+    if param == "":
+        int = Parent.GetRandom(0, len(clip_list))
+        clip = clip_list[int]
+        clip.print_clip()
+        return
+
+    i = 1
+    params = []
+    while param != "":
+        params.append(param)
+        i = i+1
+        param = data.GetParam(i).lower()
+
+    terms = [p for p in params if p not in stopwords]
+    title = ' '.join(params)
+
+
+    for clip in clip_list:
+        if clip.name == title:
+            clip.print_clip()
+        else:
+            terms
+
+
+
+
+
+
 
 
 
