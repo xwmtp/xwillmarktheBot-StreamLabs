@@ -163,6 +163,8 @@ def Execute(data):
         owl(data)
     elif m == "!clip" or m == "!clips":
         clip_check(data)
+    elif m == "!addclip" or m == "!newclip" or m == "!clipadd" or m = "clipnew":
+        add_clip(data)
     elif mess == ":)":
         smiley(data)
     else:
@@ -562,14 +564,11 @@ def owl(data):
 
 class Clip:
 
-    def __init__(self, line):
+    def __init__(self, name, link, keywords):
         parts = line.split(";")
-        self.name = parts[0]
-        self.link = parts[1]
-        try:
-            self.keywords = parts[2].split(',')
-        except:
-            self.keywords = []
+        self.name = name
+        self.link = link
+        self.keywords = keywords
 
     def print_clip(self):
         Parent.SendTwitchMessage(self.name + " " + self.link)
@@ -585,7 +584,12 @@ def load_clips():
 
     clip_list = []
     for line in lines:
-        clip = Clip(line)
+        parts = line.split(";")
+        try:
+            keywords = parts[2].split(',')
+        except:
+            keywords = []
+        clip = Clip(parts[0], parts[1], keywords)
         clip_list.append(clip)
 
     return clip_list
@@ -593,7 +597,6 @@ def load_clips():
 def clip_check(data):
 
     global clip_dict
-
 
     param = data.GetParam(1).lower()
 
@@ -617,8 +620,32 @@ def clip_check(data):
     for clip in clip_list:
         if clip.name == title:
             clip.print_clip()
+            break
         else:
-            terms
+            for term in terms:
+                if term in clip.keywords:
+                    clip.print_clip()
+                    break
+
+def add_clip(data):
+    param = data.GetParam(1).lower()
+
+    i = 1
+    link = ""
+    params = []
+    while param != "":
+        if ('clips.twitch.tv' in param):
+            if link == "":
+                Parent.SendTwitchMessage("Please only supply one clip link.")
+                return
+            link = param
+        else:
+            params.append(param)
+        i = i + 1
+        param = data.GetParam(i).lower()
+
+    clip = Clip(" ".join(params), link, params)
+
 
 
 
