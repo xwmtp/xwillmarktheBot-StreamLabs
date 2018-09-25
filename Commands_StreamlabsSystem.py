@@ -163,7 +163,7 @@ def Execute(data):
         owl(data)
     elif m == "!clip" or m == "!clips":
         clip_check(data)
-    elif m == "!addclip" or m == "!newclip" or m == "!clipadd" or m = "clipnew":
+    elif m == "!addclip" or m == "!newclip" or m == "!clipadd" or m == "clipnew":
         add_clip(data)
     elif mess == ":)":
         smiley(data)
@@ -565,7 +565,6 @@ def owl(data):
 class Clip:
 
     def __init__(self, name, link, keywords):
-        parts = line.split(";")
         self.name = name
         self.link = link
         self.keywords = keywords
@@ -576,19 +575,22 @@ class Clip:
 
 def load_clips():
     try:
-        text = open(".\Services\Scripts\CommandScript\clips.txt", "r")
+        text = open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "r")
     except IOError:
-        Parent.SendTwitchMessage("CLips document could not be opened.")
+        Parent.SendTwitchMessage("Clips document could not be opened.")
         return
     lines = text.read().split('\n')
 
     clip_list = []
     for line in lines:
+        if line == "":
+            continue
         parts = line.split(";")
         try:
             keywords = parts[2].split(',')
         except:
             keywords = []
+
         clip = Clip(parts[0], parts[1], keywords)
         clip_list.append(clip)
 
@@ -601,8 +603,7 @@ def clip_check(data):
     param = data.GetParam(1).lower()
 
     if param == "":
-        int = Parent.GetRandom(0, len(clip_list))
-        clip = clip_list[int]
+        clip = get_random_clip()
         clip.print_clip()
         return
 
@@ -618,14 +619,28 @@ def clip_check(data):
 
 
     for clip in clip_list:
-        if clip.name == title:
+
+        # clip title same as keywords?
+        if clip.name.lower() == title:
             clip.print_clip()
-            break
-        else:
-            for term in terms:
-                if term in clip.keywords:
-                    clip.print_clip()
-                    break
+            return
+        # search term in keywords?
+        for term in terms:
+            if term in clip.keywords:
+                clip.print_clip()
+                return
+        # search term in title?
+        for term in terms:
+            if term in clip.name.lower():
+                clip.print_clip()
+                return
+        # random clip
+    get_random_clip().print_clip()
+
+def get_random_clip():
+    int = Parent.GetRandom(0, len(clip_list))
+    return clip_list[int]
+
 
 def add_clip(data):
     param = data.GetParam(1).lower()
@@ -753,7 +768,7 @@ def readjson_funct(url, jsonConv = True, printMessage = True):
 
     #Parent.SendTwitchMessage(response)
     responseObj = json.loads(response)
-    return responseObj
+    #return responseObj
 
     if responseObj["status"] == 200:
         result = responseObj["response"]
@@ -971,7 +986,7 @@ class Player:
         if not self.json:
             userURL = "https://www.speedrun.com/api/v1/users?lookup=" + name
             userData = readjson(userURL)
-            if userData["data"] == []:
+            if (userData is None) or (userData["data"] == []):
                 Parent.SendTwitchMessage("User not found.")
             else:
                 name = userData['data'][0]['names']['international']
