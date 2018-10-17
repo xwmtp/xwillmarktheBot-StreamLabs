@@ -573,7 +573,7 @@ class Clip:
         Parent.SendTwitchMessage(self.name + " " + self.link)
 
     def line_string(self):
-        return name + ";" + self.link + ";" + ", ".join(self.keywords)
+        return self.name + ";" + self.link + ";" + ", ".join(self.keywords)
 
 
 def load_clips():
@@ -662,11 +662,21 @@ def add_clip(data):
         i = i + 1
         param = data.GetParam(i).lower()
 
+
+    if params != []:
+        params[0] = params[0][:1].upper() + params[0][1:]
+
     clip = Clip(" ".join(params), link, params)
 
-    with open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "a"):
-        file.write()
+    with open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "a") as file:
+        file.write("\n" + clip.line_string())
 
+    if clip.name != "":
+        name = " '" + clip.name + "'."
+    else:
+        name = "."
+
+    Parent.SendTwitchMessage("Added clip" + name)
 
 
 
