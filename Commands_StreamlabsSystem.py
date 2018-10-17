@@ -572,6 +572,9 @@ class Clip:
     def print_clip(self):
         Parent.SendTwitchMessage(self.name + " " + self.link)
 
+    def line_string(self):
+        return name + ";" + self.link + ";" + ", ".join(self.keywords)
+
 
 def load_clips():
     try:
@@ -650,7 +653,7 @@ def add_clip(data):
     params = []
     while param != "":
         if ('clips.twitch.tv' in param):
-            if link == "":
+            if link != "":
                 Parent.SendTwitchMessage("Please only supply one clip link.")
                 return
             link = param
@@ -660,6 +663,10 @@ def add_clip(data):
         param = data.GetParam(i).lower()
 
     clip = Clip(" ".join(params), link, params)
+
+    with open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "a"):
+        file.write()
+
 
 
 
