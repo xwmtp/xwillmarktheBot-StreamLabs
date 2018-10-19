@@ -122,6 +122,8 @@ def Init():
                  "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you",
                  "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"]
 
+    clean_clips() # remove duplicates from clip list
+
     return
 
 #---------------------------------------
@@ -679,22 +681,18 @@ def add_clip(data):
     Parent.SendTwitchMessage("Added clip" + name)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def clean_clips():
+    with open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "r") as file:
+        unique_lines = []
+        for line in file:
+            Parent.SendTwitchMessage(line)
+            if "\n" not in line:
+                line = line + "\n"
+            if line not in unique_lines:
+                unique_lines.append(line)
+    with open(r".\Services\Scripts\xwillmarktheBot\clips.txt", "w") as file:
+        for line in unique_lines:
+            file.write(line)
 
 
 
