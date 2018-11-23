@@ -32,7 +32,7 @@ blackoutPB = "4:21:32"
 bingoURL = "http://www.speedrunslive.com/tools/oot-bingo/"
 noSariaURL = "http://www.buzzplugg.com/bryan/v9.2nosaria/example/"
 raceURL = "#srl-"
-bingoCard = "No bingo card has been set."
+bingoCard = "N"
 raceID = ""
 skullCounter = 1
 heartsCounter = 1
@@ -168,7 +168,26 @@ def setBingo(data):
         Parent.SendTwitchMessage("The !card command has been updated (seed " + seed +").")
 
 def card():
-    Parent.SendTwitchMessage(bingoCard)
+    global raceID
+    global bingoCard
+    if bingoCard == '':
+
+        if raceID != '':
+            data = readjson_funct("http://api.speedrunslive.com/races/" + raceID)
+            goal = data['goal']
+            if goal.lower().startswith('http://www.speedrunslive.com/tools/oot-bingo/'):
+                bingoCard = goal
+                Parent.SendTwitchMessage(bingoCard)
+            else:
+                Parent.SendTwitchMessage('No card found for current race. Set card manually.')
+        else:
+            Parent.SendTwitchMessage('No race or card has been set.')
+    else:
+        Parent.SendTwitchMessage(bingoCard)
+
+
+
+
 
 
 def setRace(data):
@@ -181,6 +200,8 @@ def setRace(data):
 
         message = "The !race command has been updated (#srl-" + id + ")." + entrants
         Parent.SendTwitchMessage(message)
+
+
 def race():
     if raceID == "":
         Parent.SendTwitchMessage("No race has been set yet.")
