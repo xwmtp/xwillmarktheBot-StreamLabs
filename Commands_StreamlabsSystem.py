@@ -32,7 +32,7 @@ blackoutPB = "4:21:32"
 bingoURL = "http://www.speedrunslive.com/tools/oot-bingo/"
 noSariaURL = "http://www.buzzplugg.com/bryan/v9.2nosaria/example/"
 raceURL = "#srl-"
-bingoCard = "N"
+bingoCard = ""
 raceID = ""
 skullCounter = 1
 heartsCounter = 1
@@ -173,9 +173,9 @@ def card():
     if bingoCard == '':
 
         if raceID != '':
-            data = readjson_funct("http://api.speedrunslive.com/races/" + raceID)
-            goal = data['goal']
-            if goal.lower().startswith('http://www.speedrunslive.com/tools/oot-bingo/'):
+            data = readjson_funct("http://api.speedrunslive.com/races/" + raceID + "?callback=renderEntrants")
+            goal = data['goal'].replace('\\','').replace('amp;','')
+            if goal.lower().startswith('http://www.speedrunslive.com/tools/oot-bingo'):
                 bingoCard = goal
                 Parent.SendTwitchMessage(bingoCard)
             else:
