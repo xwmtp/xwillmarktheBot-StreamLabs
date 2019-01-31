@@ -38,7 +38,9 @@ skullCounter = 1
 heartsCounter = 1
 twoSmileys = False
 
+# OoT
 # https://www.speedrun.com/api/v1/games/j1l9qz1g/categories
+# OoT extensions
 # https://www.speedrun.com/api/v1/games/76rkv4d8/categories
 
 categories = {
@@ -60,7 +62,10 @@ categories = {
     "37_ water keys" : "xk9lqvyk",
     "all cows" : "z277n1g2",
     "all gold skulltulas" : "n2y1wo82",
+    "all songs tab" : "zdnry5q2", "all songs no rba" : "zqom5x21", "all songs rba" : "013w293q", "rqv6mvwl" : "all songs reverse order",
+    "all songs variables" : "zdnry5q2",
     "all medallions" : "5dw56r5d",
+    "nocturne rta": "02q8ggy2",
     "go home and die%" : "w2014evk",
     "no major skips" : "mkezl3jk",
     "bingo" : "none"
@@ -68,7 +73,8 @@ categories = {
 # categories with subtabs
 varCategories = {
     "glitchless",
-    "child_dungeons"
+    "child_dungeons",
+    "all songs"
 }
 # category extensions
 extCategories = {
@@ -83,6 +89,8 @@ extCategories = {
     "all cows",
     "all gold skulltulas",
     "all medallions",
+    "all songs",
+    "nocturne rta",
     "go home and die%",
     "no major skips"
 }
@@ -580,8 +588,17 @@ def checkCat(title):
             return "child_dungeons glitchless"
         else:
             return "glitchless any%"
+    if "all songs" in title:
+        if "reverse" in title:
+            return "all songs reverse order"
+        elif "no rba" in title:
+            return "all songs no rba"
+        else:
+            return "all songs rba"
     if "no im" in title:
         return "no im/ww"
+    if "nocturne" in title:
+        return "nocturne rta"
     if "child dungeons" in title:
         if "adult" in title:
             return "child_dungeons as adult"
