@@ -4,15 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>xwillmarkthebot</title>
+  <title>xwmtp</title>
   <link rel="stylesheet" href="https://stackedit.io/style.css" />
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 
 <body class="stackedit">
-  <div class="stackedit__html"><h1 id="chat-commands"><strong>Chat commands</strong></h1>
+  <div class="stackedit__html"><h1 id="commands-for-xwillmarktheplaces-chat"><strong>Commands for xwillmarktheplace’s chat</strong></h1>
 
-<p>Commands and usage for xwillmarkheBot, a Twitch bot for Ocarina of Time speedrunners (available for download <a href="https://github.com/xwmtp/xwillmarktheBot">here</a>).</p>
+<p>Commands and usage for <a href="http://twitch.tv/xwillmarktheplace">twitch.tv/xwillmarktheplace</a>. Most commands will only work when my bot is online, which is usually when I’m streaming. Get xwillmarktheBot <a href="https://github.com/xwmtp/xwillmarktheBot">here</a>.</p>
 <h2 id="records">Records</h2>
 <p>Records will be fetched from <a href="http://Speedrun.com">Speedrun.com</a>. When no argument is given, the record of the current category on stream will be returned. The bot looks at the stream title to figure out which category it is.</p>
 <p>These commands currently work for all Ocarina of Time categories (both main and extensions).</p>
@@ -71,7 +70,7 @@
 </tr>
 </tbody>
 </table><h2 id="srl-results">SRL results</h2>
-<p>Get stats on past SpeedrunsLive races of the streamer or other users. The bot is able to work with SRL, SRC, Twitch and Twitter user names.</p>
+<p>Get stats on past SRL races of the streamer or other users. The bot is able to work with SRL, SRC, Twitch and Twitter user names.</p>
 
 <table>
 <thead>
@@ -84,7 +83,7 @@
 <tbody>
 <tr>
 <td>!average</td>
-<td>Get the average of the last x races of the streamer or a user. Uses x=15 by default.</td>
+<td>Get the average of the last x bingos of the streamer or a user. Uses x=15 by default.</td>
 <td>!average, !average <em>kintefleush</em>, !average <em>5 psymarth</em></td>
 </tr>
 <tr>
@@ -94,7 +93,7 @@
 </tr>
 <tr>
 <td>!results</td>
-<td>Get the results of the last x races.</td>
+<td>Get the results of the last x bingos.</td>
 <td>!results, !results <em>kintefleush</em>, !results <em>psymarth 7</em></td>
 </tr>
 <tr>
@@ -106,6 +105,44 @@
 <td>!userpb</td>
 <td>Same as !pb, but for a specific user.</td>
 <td>!userpb <em>bonooruu rando</em></td>
+</tr>
+</tbody>
+</table><h2 id="quotes">Quotes</h2>
+<p>These are handled by Nightbot, which means they always work.</p>
+
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Result</th>
+<th>Example use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>!quote</td>
+<td>Get a random <a href="https://twitch.center/customapi/quote/list?token=14bf3eb5">quote</a>. Add a number for a specific quote, or add a search term to look for a quote. Use ‘list’ to get a link to all quotes.</td>
+<td>!quote, !quote <em>3</em>, !quote <em>bang</em>, !quote <em>list</em></td>
+</tr>
+<tr>
+<td>!addquote</td>
+<td>Add a quote. Can only by used by regulars in the chat.</td>
+<td>!addquote “Zora tunic sucks” ~ xwmtp, 2019</td>
+</tr>
+<tr>
+<td>!clip</td>
+<td>Get a random <a href="https://twitch.center/customapi/quote/list?token=e7035c97">clip</a>. Add a number for a specific clip, or add a search term to look for one.</td>
+<td>!clip, !clip <em>5</em>, !clip <em>hess</em></td>
+</tr>
+<tr>
+<td>!addclip</td>
+<td>Add a clip. Please add a title describing the clip, followed by the link. Can only be used by regulars.</td>
+<td>!addclip <em>Hess tutorial &lt;link&gt;</em></td>
+</tr>
+<tr>
+<td>!jelstertip</td>
+<td>Get a random Jelster tip.</td>
+<td>!jelstertip</td>
 </tr>
 </tbody>
 </table><h2 id="other">Other</h2>
@@ -120,11 +157,23 @@
 <tbody>
 <tr>
 <td>!commands</td>
-<td>Get the link to this page.</td>
+<td>Get athe  link to this page.</td>
 </tr>
 <tr>
-<td>!hints</td>
-<td>Get the hints found during a randomizer. Only works if the streamer is using the hints module.</td>
+<td>!monkaS</td>
+<td>Get a random monkaS.</td>
+</tr>
+<tr>
+<td>!uptime</td>
+<td>Shows how long the stream has been live.</td>
+</tr>
+<tr>
+<td>!time</td>
+<td>Shows the current time in the Netherlands (<a href="https://www.timeanddate.com/time/zone/netherlands/amsterdam">CE(S)T</a>).</td>
+</tr>
+<tr>
+<td>!social</td>
+<td>Get links to the streamer’s social media platforms.</td>
 </tr>
 </tbody>
 </table></div>
